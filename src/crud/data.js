@@ -16,14 +16,31 @@ var data = {
     tableFullName: 'think_user'
 }
 
-var fieldData = [{
+var fieldData = [];
+
+fieldData.push({
     fieldName: 'id',
     title: 'ID',
 
     db: configDb.getDefaultPrimaryKey(),
-    
-
-}];
+    moduleDatagrid: true,
+    moduleModify: {
+        show: true,
+        options: {
+            type: 'input',
+            param: {
+                readonly: true
+            }
+        }
+    },
+    moduleDetail: true,
+    moduleDelete: {
+        show: true,
+        options: {
+            deleteDepend: 'id'
+        }
+    }
+});
 
 
 var fieldDefine = {};
