@@ -1,3 +1,6 @@
+var _ = require('lodash');
+var configDb = require('./lib/configdb');
+
 var data = {
     sysNameEn: 'user',
     sysNameCn: '用户',
@@ -17,17 +20,8 @@ var fieldData = [{
     fieldName: 'id',
     title: 'ID',
 
-    db: {
-        isPrimaryKey: true, // 是否为主键
-        type: 'int', // 字符串 varchar|字符串 char|整型 int|日期 date|时间 datetime|文本 text
-        length: 11,
-        defaultVar: undefined,
-        isNotNull: true, // 是否非空
-        isAutoIncrease: true, // 是否自增
-        isUnique: true, // 是否为唯一值
-        isForeignKey: false, // 是否为外键
-        foreignKeyConfig: undefined, // 外键配置
-    }
+    db: configDb.getDefaultPrimaryKey(),
+    
 
 }];
 
