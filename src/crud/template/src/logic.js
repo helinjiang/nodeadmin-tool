@@ -17,6 +17,10 @@ export default class extends think.logic.base {
         // 只允许post操作
         this.allowMethods = "post";
 
+        <%
+            
+
+        %>
         // 其他规则
         this.rules = {
             name: "required",

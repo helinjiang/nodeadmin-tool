@@ -1,9 +1,40 @@
 var data = {
     sysNameEn: 'user',
     sysNameCn: '用户',
+
+    sysMenu: '<%=sysNameCn%>管理', // menu名字
+    sysMenuId: 'menu<%=_.capitalize(sysNameEn)%>', // menuId，用于菜单定位
+
+    sysModuleName: 'admin',
+    sysCrumb: '首页|/<%=sysModuleName%>|home;系统管理;<%=sysNameCn%>管理', //面包屑导航
+    sysDesc: '管理<%=sysNameCn%>信息', // 功能描述
+
+    tableName: 'user',
+    tableFullName: 'think_user'
 }
 
+var fieldData = [{
+    fieldName: 'id',
+    title: 'ID',
+
+    db: {
+        isPrimaryKey: true, // 是否为主键
+        type: 'int', // 字符串 varchar|字符串 char|整型 int|日期 date|时间 datetime|文本 text
+        length: 11,
+        defaultVar: undefined,
+        isNotNull: true, // 是否非空
+        isAutoIncrease: true, // 是否自增
+        isUnique: true, // 是否为唯一值
+        isForeignKey: false, // 是否为外键
+        foreignKeyConfig: undefined, // 外键配置
+    }
+
+}];
+
+
 var fieldDefine = {};
+
+
 
 // ID
 fieldDefine.id = {
@@ -184,6 +215,6 @@ fieldDefine.stateShow = {
     moduleDelete: true
 };
 
-data.fieldDefine=fieldDefine;
+data.fieldDefine = fieldDefine;
 
 module.exports = data;

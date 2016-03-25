@@ -11,11 +11,9 @@ var BASE_PATH = 'D:/code/nodeadmin-tool/src/crud',
     RESULT_SRC_PATH = path.join(RESULT_BASE_PATH, 'src'),
     MODULE = 'admin';
 
-function saveSrcModel() {
-    var savePath = path.join(RESULT_SRC_PATH, MODULE, 'model'),
-        saveFileName = data.sysNameEn + '.js',
-        saveFullPath = path.join(savePath, saveFileName),
-        tplFullPath =  path.join(TEMPLATE_BASE_PATH, 'src/model.js'),
+
+function saveTo(tplFullPath, saveFullPath) {
+    var savePath = path.dirname(saveFullPath),
         content = fs.readFileSync(tplFullPath, 'utf8');
 
     mkdirp(savePath, function(err) {
@@ -34,5 +32,24 @@ function saveSrcModel() {
 
 }
 
-saveSrcModel();
+// saveSrcModel();
 // console.log(path.relative(process.argv[1],'./template/src/model.js'));
+var arr = [{
+    from: path.join(TEMPLATE_BASE_PATH, 'src/model.js'),
+    to: path.join(RESULT_SRC_PATH, MODULE, 'model', data.sysNameEn + '.js')
+}, {
+    from: path.join(TEMPLATE_BASE_PATH, 'src/logic.js'),
+    to: path.join(RESULT_SRC_PATH, MODULE, 'logic', data.sysNameEn + '.js')
+}];
+// saveTo(path.join(TEMPLATE_BASE_PATH, 'src/model.js'), path.join(RESULT_SRC_PATH, MODULE, 'model', data.sysNameEn + '.js'));
+
+// arr.forEach(function(item) {
+//     saveTo(item.from, item.to);
+// });
+
+var fieldDefine = data.fieldDefine,
+    fieldArr = Object.keys(fieldDefine);
+
+var test =  _.template(data.sysCrumb)(data);
+console.log(test);
+
