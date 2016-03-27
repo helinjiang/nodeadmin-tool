@@ -18,16 +18,16 @@ var data = {
 
 var fieldData = [];
 
+// ID
 fieldData.push({
     fieldName: 'id',
     title: 'ID',
 
     db: configDb.getDefaultPrimaryKey(),
+
     moduleDatagrid: true,
     moduleModify: {
-        show: true,
         options: {
-            type: 'input',
             param: {
                 readonly: true
             }
@@ -35,7 +35,6 @@ fieldData.push({
     },
     moduleDetail: true,
     moduleDelete: {
-        show: true,
         options: {
             deleteDepend: 'id'
         }
@@ -43,51 +42,19 @@ fieldData.push({
 });
 
 
-var fieldDefine = {};
-
-
-
-// ID
-fieldDefine.id = {
-    title: 'ID',
-    moduleDatagrid: true,
-    moduleModify: {
-        show: true,
-        options: {
-            type: 'input',
-            param: {
-                readonly: true
-            }
-        }
-    },
-    moduleDetail: true,
-    moduleDelete: {
-        show: true,
-        options: {
-            deleteDepend: 'id'
-        }
-    }
-};
-
-// 用户名
-fieldDefine.name = {
+// name
+fieldData.push({
+    fieldName: 'name',
     title: '用户名',
-    moduleDatagrid: {
-        show: true,
-        options: {
-            css: 'namecss'
-        }
-    },
-    moduleAdd: {
-        show: true,
-        options: {
-            type: 'input'
-        }
-    },
+
+    db: _.merge(configDb.getDefaultString(true), {
+        isUnique: true
+    }),
+
+    moduleDatagrid: true,
+    moduleAdd: true,
     moduleModify: {
-        show: true,
         options: {
-            type: 'input',
             param: {
                 readonly: true
             }
@@ -109,15 +76,19 @@ fieldDefine.name = {
             message: '最大长度为64'
         }
     }
-};
+});
 
-// 密码
-fieldDefine.pwd = {
+// pwd
+fieldData.push({
+    fieldName: 'pwd',
     title: '密码',
+
+    db: _.merge(configDb.getDefaultString(true), {
+        type: 'char'
+    }),
+
     moduleAdd: {
-        show: true,
         options: {
-            type: 'input',
             param: {
                 type: 'password'
             }
@@ -137,64 +108,37 @@ fieldDefine.pwd = {
             message: '最大长度为32'
         }
     }
-};
+});
 
-// 状态
-fieldDefine.state = {
+// state
+fieldData.push({
+    fieldName: 'state',
     title: '状态',
+
+    db: configDb.getDefaultState(),
+
     moduleAdd: {
-        show: true,
         options: {
-            type: 'select2',
-            value: '1',
-            param: {
-                options: [{
-                    title: '有效',
-                    value: '1'
-                }, {
-                    title: '无效',
-                    value: '-1'
-                }]
-            }
+            value: 1
         }
     },
-    moduleModify: {
-        show: true,
-        options: {
-            type: 'select2',
-            param: {
-                options: [{
-                    title: '有效',
-                    value: '1'
-                }, {
-                    title: '无效',
-                    value: '-1'
-                }]
-            }
-        }
-    },
-    validator: {
-        required: true
-    }
-};
+    moduleModify: true
+});
 
 // 生日
-fieldDefine.birthday = {
+fieldData.push({
+    fieldName: 'birthday',
     title: '生日',
+
+    db: configDb.getDefaultDate(),
+
     moduleDatagrid: true,
     moduleAdd: {
-        show: true,
         options: {
-            type: 'date',
             value: '2016-03-01'
         }
     },
-    moduleModify: {
-        show: true,
-        options: {
-            type: 'date'
-        }
-    },
+    moduleModify: true,
     moduleDetail: true,
     moduleDelete: true,
     validator: {
@@ -203,29 +147,41 @@ fieldDefine.birthday = {
             message: '生日不能为空！'
         }
     }
-};
+});
 
 // 创建时间
-fieldDefine.createTime = {
+fieldData.push({
+    fieldName: 'createTime',
     title: '创建时间',
+
+    db: configDb.getDefaultTime(),
+
     moduleDatagrid: true
-};
+});
 
 // 更新时间
-fieldDefine.updateTime = {
+fieldData.push({
+    fieldName: 'updateTime',
     title: '更新时间',
-    moduleDatagrid: true
-};
 
+    db: configDb.getDefaultTime(),
+
+    moduleDatagrid: true
+});
 
 // 状态，对应的是state
-fieldDefine.stateShow = {
+fieldData.push({
+    fieldName: 'stateShow',
     title: '状态',
+
     moduleDatagrid: true,
     moduleDetail: true,
     moduleDelete: true
-};
+});
 
-data.fieldDefine = fieldDefine;
+
+data.fieldData = fieldData;
+
+data.fieldDefine = {};
 
 module.exports = data;

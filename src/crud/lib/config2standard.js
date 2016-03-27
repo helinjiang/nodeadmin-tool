@@ -10,13 +10,45 @@ function optionShow(isShow) {
     }
 }
 
+/**
+ * 将各模块如何展示的配置丰富化，完善，并给与默认值，返回一个合格的数据
+ *
+ * 配置项说明
+ * 1. false|undefined
+ *     返回{show:false}
+ *
+ * 2. true
+ *     默认值
+ *
+ * 3. 对象{
+ *     options: {
+ *         xx:yy
+ *     }
+ * }
+ *     返回 {
+ *         show : true,       
+ *         options: {
+ *             type: 'input', // 表单类型
+ *             param: { // 表单的额外参数
+ *                 readonly: true
+ *             },
+ *             value: xx, // 默认值
+ *             deleteDepend:'id', // 只有在delete场景下才用得到
+ *         }
+ *     }
+ * 
+ * @param  {string|boolean|object}   value      p配置值
+ * @param  {boolean}  isShowForm 是否处理成表格
+ * @param  {object}   fieldData  该字段的定义
+ * @return {object}              合格的数据
+ */
 function moduleShow(value, isShowForm, fieldData) {
     // 如果value为 false  或为 false 值，则说明它并不想显示
     if (!value) {
         return optionShow(false);
     }
 
-    // 要么为boolean值，要么为object，也说明它并不想显示
+    // 如果value不是boolean值，也不是object，也说明它并不想显示
     if (typeof value !== 'boolean' && typeof value !== 'object') {
         return optionShow(false);
     }
@@ -85,6 +117,16 @@ function moduleShow(value, isShowForm, fieldData) {
     });
 
 }
+
+
+/**
+ * validator 
+ * 默认校验标准为数据库配置，但是可以有额外的覆盖，比如限制3-12长度，虽然可能数据库长度为64
+ */
+
+// 状态stateShow能否有对应关系
+
+
 
 var test = moduleShow(true, true, {
     fieldName: 'state',
