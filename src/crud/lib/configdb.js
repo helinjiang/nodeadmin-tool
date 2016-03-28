@@ -6,7 +6,7 @@ function ConfigDb() {
      * 如果此处设置有值，则以该值为准
      * @type {[type]}
      */
-    this. filedName = undefined;
+    this.fieldName = undefined;
     /**
      * 字符串 varchar|字符串 char|整型 int|日期 date|时间 datetime|文本 text
      * @type {String}
@@ -134,4 +134,11 @@ function getDefaultMark() {
     });
 }
 
-console.log(getDefaultTime());
+module.exports = {
+    getDefaultPrimaryKey: getDefaultPrimaryKey,
+    getDefaultString: getDefaultString,
+    getDefaultState: getDefaultState,
+    getDefaultTime: getDefaultTime,
+    getDefaultDate: getDefaultDate,
+    getDefaultMark: getDefaultMark
+}

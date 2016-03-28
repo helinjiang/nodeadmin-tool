@@ -4,14 +4,6 @@ var configDb = require('./lib/configdb');
 var data = {
     sysNameEn: 'user',
     sysNameCn: '用户',
-
-    sysMenu: '<%=sysNameCn%>管理', // menu名字
-    sysMenuId: 'menu<%=_.capitalize(sysNameEn)%>', // menuId，用于菜单定位
-
-    sysModuleName: 'admin',
-    sysCrumb: '首页|/<%=sysModuleName%>|home;系统管理;<%=sysNameCn%>管理', //面包屑导航
-    sysDesc: '管理<%=sysNameCn%>信息', // 功能描述
-
     tableName: 'user',
     tableFullName: 'think_user'
 }

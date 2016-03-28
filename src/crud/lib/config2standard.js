@@ -13,6 +13,8 @@ function optionShow(isShow) {
 /**
  * 将各模块如何展示的配置丰富化，完善，并给与默认值，返回一个合格的数据
  *
+ * TODO 还有个priority，以便控制显示的顺序
+ *
  * 配置项说明
  * 1. false|undefined
  *     返回{show:false}
@@ -111,11 +113,16 @@ function moduleShow(value, isShowForm, fieldData) {
         _.merge(options, value.options);
     }
 
+    var result = _.merge({}, optionShow(true));
 
-    return _.merge({}, optionShow(true), {
-        options: options
-    });
+    // 只有options非空情况下才设置
+    if (!_.isEmpty(options)) {
+        _.merge(result, {
+            options: options
+        });
+    }
 
+    return result;
 }
 
 
@@ -128,22 +135,123 @@ function moduleShow(value, isShowForm, fieldData) {
 
 
 
-var test = moduleShow(true, true, {
-    fieldName: 'state',
-    db: {
-        type: 'varchar'
-    }
-})
-console.log(test);
-console.log(JSON.stringify(test));
-
-// console.log(moduleShow({
-//     options: {
-//         type: 'input',
-//         param: {
-//             readonly: true
-//         }
+// var test = moduleShow(true, true, {
+//     fieldName: 'state',
+//     db: {
+//         type: 'varchar'
 //     }
-// }, false, {
-//     type: 'varchar'
-// }))
+// })
+// console.log(test);
+// console.log(JSON.stringify(test));
+
+var data = require('../data');
+var fs = require('fs');
+fs.writeFileSync('./test1.json', JSON.stringify(data));
+
+var defaultConfig = {
+    'sysMenu': '<%=sysNameCn%>管理',
+    'sysMenuId': 'menu<%=_.capitalize(sysNameEn)%>',
+    'sysModuleName': 'admin',
+    'sysCrumb': '首页|/<%=sysModuleName%>|home;系统管理;<%=sysNameCn%>管理',
+    'sysDesc': '管理<%=sysNameCn%>信息',
+}
+
+data.sysNameCn = data.sysNameCn || data.sysNameEn;
+data.sysMenu = _.template(data.sysMenu || defaultConfig.sysMenu)(data);
+data.sysMenuId = _.template(data.sysMenuId || defaultConfig.sysMenuId)(data);
+data.sysModuleName = _.template(data.sysModuleName || defaultConfig.sysModuleName)(data);
+data.sysCrumb = _.template(data.sysCrumb || defaultConfig.sysCrumb)(data);
+data.sysDesc = _.template(data.sysDesc || defaultConfig.sysDesc)(data);
+
+// 处理fieldData字段
+var fieldData = data.fieldData;
+
+// 数据库主键
+var primaryKey;
+
+// 需要保持唯一的字段
+var uniqueArr = [];
+
+fieldData.forEach(item => {
+    var fieldName = item.fieldName,
+        title = item.title || fieldName,
+        dbData = item.db;
+
+    //有可能title都没配置
+    item.title = title;
+
+    // 如果该字段不是数据库字段，则它是没有这个配置项的
+    if (dbData) {
+        // 数据库表中的字段名称，默认应该和fieldName一致，但也可能会不一样哦
+        dbData.fieldName = dbData.fieldName || fieldName;
+
+        // 判断是否为主键
+        if (dbData.isPrimaryKey) {
+            primaryKey = fieldName;
+        }
+
+        var validator = {};
+
+        // 判断是否为非空
+        if (dbData.isNotNull) {
+            validator.required = {
+                rule: true,
+                message: title + '不能为空！'
+            }
+        }
+
+        // 是否需要保持唯一性
+        if (dbData.isUnique) {
+            uniqueArr.push(fieldName);
+        }
+
+        // 如果是int类型的，则需要判断其是否为数字
+        switch (dbData.type) {
+            case 'int':
+                if (dbData.property && dbData.property.toUpperCase() == 'UNSIGNED') {
+                    validator.digits = {
+                        rule: true,
+                        message: title + '必须为数字！'
+                    }
+                }
+                // if(!dbData.isAutoIncrease){
+                //     validator.maxlength = dbData.length;
+                // }
+                break;
+
+            case 'varchar':
+            case 'char':
+                if (dbData.length) {
+                    validator.maxlength = {
+                        rule: dbData.length,
+                        message: '最大长度为' + dbData.length
+                    }
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    // 如果定义了validator则合并之
+    if (typeof item.validator == 'object') {
+        _.merge(validator, item.validator);
+    }
+
+    if (!_.isEmpty(validator)) {
+        item.validator = validator;
+    }
+
+    item.moduleDatagrid = moduleShow(item.moduleDatagrid, false, item);
+    item.moduleAdd = moduleShow(item.moduleAdd, true, item);
+    item.moduleModify = moduleShow(item.moduleModify, true, item);
+    item.moduleDelete = moduleShow(item.moduleDelete, false, item);
+    item.moduleDetail = moduleShow(item.moduleDetail, false, item);
+});
+
+
+data.primaryKey = primaryKey;
+data.uniqueArr = uniqueArr;
+
+fs.writeFileSync('./test2.json', JSON.stringify(data));
