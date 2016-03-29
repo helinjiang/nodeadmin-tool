@@ -1,8 +1,7 @@
 'use strict';
+
 /**
  * logic
- * @param  {} []
- * @return {}     []
  */
 export default class extends think.logic.base {
     /**
@@ -18,16 +17,21 @@ export default class extends think.logic.base {
         this.allowMethods = "post";
 
         <%
-            
-
+        var rulesRequired = [];
+        fieldData.forEach(function(item) {
+            if (item.moduleAdd && item.moduleAdd.show && item.validator && item.validator.required && item.validator.required.rule) {
+                rulesRequired.push(item.fieldName);
+            }
+        });
+        console.log('---',rulesRequired);
         %>
+
+        <% if (rulesRequired.length){%>
         // 其他规则
         this.rules = {
-            name: "required",
-            pwd: "required",
-            state: "required",
-            birthday: "required"
+            <%=rulesRequired.map((item)=>{return "name:'required'"}).join(',');
         };
+        <%}%>
     }
 
     modifyAction() {

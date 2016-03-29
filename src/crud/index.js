@@ -58,8 +58,12 @@ function save(saveFullPath, content) {
  * @param  {string}   tplFullPath  模版
  * @param  {string}   saveFullPath 保存的路径
  */
-function saveTo(tplFullPath, saveFullPath) {
+function saveTo(tplFullPath, saveFullPath, tplData) {
     var content = fs.readFileSync(tplFullPath, 'utf8');
+
+    if (tplData) {
+        content = _.template(content)(tplData);
+    }
 
     // 保存
     save(saveFullPath, content);
@@ -69,12 +73,14 @@ function saveTo(tplFullPath, saveFullPath) {
 // console.log(path.relative(process.argv[1],'./template/src/model.js'));
 var arr = [{
     from: path.join(TEMPLATE_BASE_PATH, 'src/model.js'),
-    to: path.join(RESULT_SRC_PATH, MODULE, 'model', data.sysNameEn + '.js')
+    to: path.join(RESULT_SRC_PATH, MODULE, 'model', data.sysNameEn + '.js'),
+    data: data
 }, {
     from: path.join(TEMPLATE_BASE_PATH, 'src/logic.js'),
-    to: path.join(RESULT_SRC_PATH, MODULE, 'logic', data.sysNameEn + '.js')
+    to: path.join(RESULT_SRC_PATH, MODULE, 'logic', data.sysNameEn + '.js'),
+    data: data
 }];
 
-// arr.forEach(function(item) {
-//     saveTo(item.from, item.to);
-// });
+arr.forEach(function(item) {
+    saveTo(item.from, item.to);
+});
