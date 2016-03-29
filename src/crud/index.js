@@ -3,18 +3,40 @@ var path = require('path');
 var _ = require('lodash');
 var mkdirp = require('mkdirp');
 
-var data = require('./data');
-
 var BASE_PATH = 'D:/code/nodeadmin-tool/src/crud',
     RESULT_BASE_PATH = path.join(BASE_PATH, 'result'),
     TEMPLATE_BASE_PATH = path.join(BASE_PATH, 'template'),
     RESULT_SRC_PATH = path.join(RESULT_BASE_PATH, 'src'),
+    RESULT_DATA_PATH = path.join(RESULT_BASE_PATH, 'data'),
     MODULE = 'admin';
 
+// 原始的data.js的内容，将其备份一份
+var configDataContent = fs.readFileSync(path.join(BASE_PATH, 'data.js'), 'utf8'),
+    configDataSavePath = path.join(RESULT_DATA_PATH, 'data_bak.js');
 
-function saveTo(tplFullPath, saveFullPath) {
-    var savePath = path.dirname(saveFullPath),
-        content = fs.readFileSync(tplFullPath, 'utf8');
+save(configDataSavePath, configDataContent);
+
+// 计算之后的data数据，也将其备份一份
+var initData = require('./data'),
+    initDataSavePath = path.join(RESULT_DATA_PATH, 'data_init.js');
+
+save(initDataSavePath, JSON.stringify(initData, null, 4));
+
+// 标准化的data数据，也将其备份一份
+var config2standard = require('./lib/config2standard'),
+    data = config2standard.getStandardData(initData),
+    dataSavePath = path.join(RESULT_DATA_PATH, 'data.js');
+
+save(dataSavePath, JSON.stringify(data, null, 4));
+
+
+/**
+ * 开始拷贝
+ * @param  {string}   content  内容
+ * @param  {string}   saveFullPath 保存的路径
+ */
+function save(saveFullPath, content) {
+    var savePath = path.dirname(saveFullPath);
 
     mkdirp(savePath, function(err) {
         if (err) {
@@ -29,7 +51,18 @@ function saveTo(tplFullPath, saveFullPath) {
             console.log('It\'s saved : ' + saveFullPath);
         });
     });
+}
 
+/**
+ * 开始拷贝
+ * @param  {string}   tplFullPath  模版
+ * @param  {string}   saveFullPath 保存的路径
+ */
+function saveTo(tplFullPath, saveFullPath) {
+    var content = fs.readFileSync(tplFullPath, 'utf8');
+
+    // 保存
+    save(saveFullPath, content);
 }
 
 // saveSrcModel();
@@ -41,15 +74,7 @@ var arr = [{
     from: path.join(TEMPLATE_BASE_PATH, 'src/logic.js'),
     to: path.join(RESULT_SRC_PATH, MODULE, 'logic', data.sysNameEn + '.js')
 }];
-// saveTo(path.join(TEMPLATE_BASE_PATH, 'src/model.js'), path.join(RESULT_SRC_PATH, MODULE, 'model', data.sysNameEn + '.js'));
 
 // arr.forEach(function(item) {
 //     saveTo(item.from, item.to);
 // });
-
-var fieldDefine = data.fieldDefine,
-    fieldArr = Object.keys(fieldDefine);
-
-var test =  _.template(data.sysCrumb)(data);
-console.log(test);
-

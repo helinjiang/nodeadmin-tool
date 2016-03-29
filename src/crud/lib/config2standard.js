@@ -1,7 +1,8 @@
 /**
  * 用户输入尽可能简单，因此在程序处理之前，要将其再进行加工处理，将其丰富化，以便逻辑处理
+ * 状态stateShow能否有对应关系
  */
-
+var fs = require('fs');
 var _ = require('lodash');
 
 function optionShow(isShow) {
@@ -125,133 +126,129 @@ function moduleShow(value, isShowForm, fieldData) {
     return result;
 }
 
-
 /**
- * validator 
- * 默认校验标准为数据库配置，但是可以有额外的覆盖，比如限制3-12长度，虽然可能数据库长度为64
+ * 获得标准的数据，并返回
+ * @param  {object}   initData 初始数据
+ * @return {object}            标准化的数据
  */
+function getStandardData(initData) {
+    var data = _.merge({}, initData);
+    // fs.writeFileSync('./test1.json', JSON.stringify(data, null, 4));
 
-// 状态stateShow能否有对应关系
+    var defaultConfig = {
+        'sysMenu': '<%=sysNameCn%>管理',
+        'sysMenuId': 'menu<%=_.capitalize(sysNameEn)%>',
+        'sysModuleName': 'admin',
+        'sysCrumb': '首页|/<%=sysModuleName%>|home;系统管理;<%=sysNameCn%>管理',
+        'sysDesc': '管理<%=sysNameCn%>信息',
+    }
 
+    data.sysNameCn = data.sysNameCn || data.sysNameEn;
+    data.sysMenu = _.template(data.sysMenu || defaultConfig.sysMenu)(data);
+    data.sysMenuId = _.template(data.sysMenuId || defaultConfig.sysMenuId)(data);
+    data.sysModuleName = _.template(data.sysModuleName || defaultConfig.sysModuleName)(data);
+    data.sysCrumb = _.template(data.sysCrumb || defaultConfig.sysCrumb)(data);
+    data.sysDesc = _.template(data.sysDesc || defaultConfig.sysDesc)(data);
 
+    // 处理fieldData字段
+    var fieldData = data.fieldData;
 
-// var test = moduleShow(true, true, {
-//     fieldName: 'state',
-//     db: {
-//         type: 'varchar'
-//     }
-// })
-// console.log(test);
-// console.log(JSON.stringify(test));
+    // 数据库主键
+    var primaryKey;
 
-var data = require('../data');
-var fs = require('fs');
-fs.writeFileSync('./test1.json', JSON.stringify(data));
+    // 需要保持唯一的字段
+    var uniqueArr = [];
 
-var defaultConfig = {
-    'sysMenu': '<%=sysNameCn%>管理',
-    'sysMenuId': 'menu<%=_.capitalize(sysNameEn)%>',
-    'sysModuleName': 'admin',
-    'sysCrumb': '首页|/<%=sysModuleName%>|home;系统管理;<%=sysNameCn%>管理',
-    'sysDesc': '管理<%=sysNameCn%>信息',
-}
+    fieldData.forEach(item => {
+        var fieldName = item.fieldName,
+            title = item.title || fieldName,
+            dbData = item.db;
 
-data.sysNameCn = data.sysNameCn || data.sysNameEn;
-data.sysMenu = _.template(data.sysMenu || defaultConfig.sysMenu)(data);
-data.sysMenuId = _.template(data.sysMenuId || defaultConfig.sysMenuId)(data);
-data.sysModuleName = _.template(data.sysModuleName || defaultConfig.sysModuleName)(data);
-data.sysCrumb = _.template(data.sysCrumb || defaultConfig.sysCrumb)(data);
-data.sysDesc = _.template(data.sysDesc || defaultConfig.sysDesc)(data);
+        //有可能title都没配置
+        item.title = title;
 
-// 处理fieldData字段
-var fieldData = data.fieldData;
+        // 如果该字段不是数据库字段，则它是没有这个配置项的
+        if (dbData) {
+            // 数据库表中的字段名称，默认应该和fieldName一致，但也可能会不一样哦
+            dbData.fieldName = dbData.fieldName || fieldName;
 
-// 数据库主键
-var primaryKey;
+            // 判断是否为主键
+            if (dbData.isPrimaryKey) {
+                primaryKey = fieldName;
+            }
 
-// 需要保持唯一的字段
-var uniqueArr = [];
+            var validator = {};
 
-fieldData.forEach(item => {
-    var fieldName = item.fieldName,
-        title = item.title || fieldName,
-        dbData = item.db;
+            // 判断是否为非空
+            if (dbData.isNotNull) {
+                validator.required = {
+                    rule: true,
+                    message: title + '不能为空！'
+                }
+            }
 
-    //有可能title都没配置
-    item.title = title;
+            // 是否需要保持唯一性
+            if (dbData.isUnique) {
+                uniqueArr.push(fieldName);
+            }
 
-    // 如果该字段不是数据库字段，则它是没有这个配置项的
-    if (dbData) {
-        // 数据库表中的字段名称，默认应该和fieldName一致，但也可能会不一样哦
-        dbData.fieldName = dbData.fieldName || fieldName;
+            // 如果是int类型的，则需要判断其是否为数字
+            switch (dbData.type) {
+                case 'int':
+                    if (dbData.property && dbData.property.toUpperCase() == 'UNSIGNED') {
+                        validator.digits = {
+                            rule: true,
+                            message: title + '必须为数字！'
+                        }
+                    }
+                    // if(!dbData.isAutoIncrease){
+                    //     validator.maxlength = dbData.length;
+                    // }
+                    break;
 
-        // 判断是否为主键
-        if (dbData.isPrimaryKey) {
-            primaryKey = fieldName;
-        }
+                case 'varchar':
+                case 'char':
+                    if (dbData.length) {
+                        validator.maxlength = {
+                            rule: dbData.length,
+                            message: '最大长度为' + dbData.length
+                        }
+                    }
+                    break;
 
-        var validator = {};
-
-        // 判断是否为非空
-        if (dbData.isNotNull) {
-            validator.required = {
-                rule: true,
-                message: title + '不能为空！'
+                default:
+                    break;
             }
         }
-
-        // 是否需要保持唯一性
-        if (dbData.isUnique) {
-            uniqueArr.push(fieldName);
+        /**
+         * validator 
+         * 默认校验标准为数据库配置，但是可以有额外的覆盖，比如限制3-12长度，虽然可能数据库长度为64
+         *
+         * 如果定义了validator则合并之
+         */
+        if (typeof item.validator == 'object') {
+            _.merge(validator, item.validator);
         }
 
-        // 如果是int类型的，则需要判断其是否为数字
-        switch (dbData.type) {
-            case 'int':
-                if (dbData.property && dbData.property.toUpperCase() == 'UNSIGNED') {
-                    validator.digits = {
-                        rule: true,
-                        message: title + '必须为数字！'
-                    }
-                }
-                // if(!dbData.isAutoIncrease){
-                //     validator.maxlength = dbData.length;
-                // }
-                break;
-
-            case 'varchar':
-            case 'char':
-                if (dbData.length) {
-                    validator.maxlength = {
-                        rule: dbData.length,
-                        message: '最大长度为' + dbData.length
-                    }
-                }
-                break;
-
-            default:
-                break;
+        if (!_.isEmpty(validator)) {
+            item.validator = validator;
         }
-    }
 
-    // 如果定义了validator则合并之
-    if (typeof item.validator == 'object') {
-        _.merge(validator, item.validator);
-    }
-
-    if (!_.isEmpty(validator)) {
-        item.validator = validator;
-    }
-
-    item.moduleDatagrid = moduleShow(item.moduleDatagrid, false, item);
-    item.moduleAdd = moduleShow(item.moduleAdd, true, item);
-    item.moduleModify = moduleShow(item.moduleModify, true, item);
-    item.moduleDelete = moduleShow(item.moduleDelete, false, item);
-    item.moduleDetail = moduleShow(item.moduleDetail, false, item);
-});
+        item.moduleDatagrid = moduleShow(item.moduleDatagrid, false, item);
+        item.moduleAdd = moduleShow(item.moduleAdd, true, item);
+        item.moduleModify = moduleShow(item.moduleModify, true, item);
+        item.moduleDelete = moduleShow(item.moduleDelete, false, item);
+        item.moduleDetail = moduleShow(item.moduleDetail, false, item);
+    });
 
 
-data.primaryKey = primaryKey;
-data.uniqueArr = uniqueArr;
+    data.primaryKey = primaryKey;
+    data.uniqueArr = uniqueArr;
 
-fs.writeFileSync('./test2.json', JSON.stringify(data));
+    // fs.writeFileSync('./test2.json', JSON.stringify(data, null, 4));
+    return data;
+}
+
+module.exports = {
+    getStandardData: getStandardData
+}
