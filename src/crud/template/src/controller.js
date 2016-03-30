@@ -63,9 +63,7 @@ export default class extends BaseCrud {
      * @return {object} JSON 格式数据
      */
     addAction() {
-        // 获取参数
-        let {
-            <% var addItemArr = [], getDateTimeStr='', getPwdStr='', recordObj={};
+        <% var addItemArr = [], getDateTimeStr='', getPwdStr='', recordObj={};
             fieldData.forEach(function(item) {
                 if (item.moduleAdd && item.moduleAdd.show) {
                     addItemArr.push(item);
@@ -89,7 +87,10 @@ export default class extends BaseCrud {
                     recordObj['updateTime'] = 'datetime';
                 }
             });
-            %><%= addItemArr.map((item)=>{return item.fieldName}).join(',') %>
+        %>
+        // 获取参数
+        let {
+            <%= addItemArr.map((item)=>{return item.fieldName}).join(',') %>
         } = this.post();
 
         <%= getDateTimeStr %>        
@@ -128,29 +129,58 @@ export default class extends BaseCrud {
      * @return {object} JSON 格式数据
      */
     modifyAction() {
+        <% var modifyItemArr = [], getDateTimeStr='', getPwdStr='', recordObj={};
+            fieldData.forEach(function(item) {
+                if (item.moduleModify && item.moduleModify.show) {
+                    modifyItemArr.push(item);
+                    recordObj[item.fieldName] = item.fieldName;
+
+                    if (item.moduleModify.options 
+                        && item.moduleModify.options.param
+                        && item.moduleModify.options.param.type 
+                        &&  item.moduleModify.options.param.type === 'password') {
+                        getPwdStr = item.fieldName + " = think.md5('think_' + " + item.fieldName + ");";
+                    }
+                }
+
+                if(item.fieldName == 'updateTime'){
+                    getDateTimeStr='let datetime = this.getCurTimeStr();';
+                    recordObj['updateTime'] = 'datetime';
+                }
+            });
+        %>
         // 获取参数
         let {
-            id, name, state, birthday
+            <%= modifyItemArr.map((item)=>{return item.fieldName}).join(',') %>
         } = this.post();
 
-        let datetime = this.getCurTimeStr();
+        <%= getDateTimeStr %>        
+
+        <%= getPwdStr %>
 
         let record = {
-            id: id,
-            name: name,
-            updateTime: datetime,
-            state: state,
-            birthday: birthday
+            <%= Object.keys(recordObj).map((item)=>{return item+': '+recordObj[item]}).join(',') %>    
         };
 
         let model = this.model('<%=sysNameEn%>');
 
         // 参数校验，在logic中已完成
 
+        <% var pStr='', pArr=[];
+            if(typeof primaryKey != 'undefined'){
+                pArr.push("keyId: '"+primaryKey+"'");
+            }
+            if(typeof uniqueArr != 'undefined' && uniqueArr.length){
+                var puArr = uniqueArr.map((item)=>{return item + ': record.' + item});
+                pArr.push('uniqueCheck: {'+puArr.join(',')+'}');
+            }
+
+            if(pArr.length){
+                pStr = ',{'+pArr.join(',')+'}';
+            }
+        %>
         // 保存
-        return this.saveToDB(model, record, {
-            keyId: 'id'
-        });
+        return this.saveToDB(model, record<%= pStr %>);
 
     }
 
@@ -160,8 +190,16 @@ export default class extends BaseCrud {
      * @return {object} JSON 格式数据
      */
     deleteAction() {
+        <% var deleteItemArr = [];
+            fieldData.forEach(function(item) {
+                if (item.moduleDelete && item.moduleDelete.show && item.moduleDelete.options && item.moduleDelete.options.deleteDepend) {
+                    deleteItemArr.push(item);
+                }
+            });
+        %>
         // 获取参数
-        let id = this.post('id');
+        <%= deleteItemArr.map((item)=>{return "let "+item.fieldName+" = this.post('"+item.fieldName+"');"}).join('') %>
+
         let model = this.model('<%=sysNameEn%>');
 
         // 参数校验，在logic中已完成
@@ -170,7 +208,7 @@ export default class extends BaseCrud {
 
         // 删除
         return this.deleteFromDB(model, {
-            id: id
+            <%= deleteItemArr.map((item)=>{return item.fieldName+": "+item.fieldName}).join(',') %>
         });
     }
 }
