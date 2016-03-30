@@ -104,13 +104,21 @@ export default class extends BaseCrud {
 
         // 参数校验，在logic中已完成
 
-        // 保存
-        return this.saveToDB(model, record, {
-            keyId: 'id',
-            uniqueCheck: {
-                name: record.name
+        <% var pStr='', pArr=[];
+            if(typeof primaryKey != 'undefined'){
+                pArr.push("keyId: '"+primaryKey+"'");
             }
-        });
+            if(typeof uniqueArr != 'undefined' && uniqueArr.length){
+                var puArr = uniqueArr.map((item)=>{return item + ': record.' + item});
+                pArr.push('uniqueCheck: {'+puArr.join(',')+'}');
+            }
+
+            if(pArr.length){
+                pStr = ',{'+pArr.join(',')+'}';
+            }
+        %>
+        // 保存
+        return this.saveToDB(model, record<%= pStr %>);
 
     }
 
