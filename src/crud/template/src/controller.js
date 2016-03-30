@@ -25,8 +25,8 @@ export default class extends BaseCrud {
 
         // 为了最后的显示，进行数据处理
         data = this.convertToDatagrid(data, item => {
-            <%  // 转义date类型的数据
-            var dateTypeArr = [];
+            <%/* 转义dateTime类型的数据*/%>
+            <%   var dateTypeArr = [];
             fieldData.forEach(function(item) {
                 if (item.moduleDatagrid && item.moduleDatagrid.show && item.db && item.db.type == 'date') {
                     dateTypeArr.push(item);
@@ -36,12 +36,12 @@ export default class extends BaseCrud {
             <% if (dateTypeArr.length) { %>
                 <%=dateTypeArr.map((item)=>{return ['// '+item.title, 'item.'+item.fieldName+' = this.getCurDateStr(item.'+item.fieldName+');'].join('\n')}).join('\n\n')%>
             <% } %>
-            
 
-            <%// 转义dateTime类型的数据
-            var dateTimeTypeArr = [];
+
+            <%/* 转义dateTime类型的数据*/%>
+            <% var dateTimeTypeArr = [];
             fieldData.forEach(function(item) {
-                if (item.moduleDatagrid && item.moduleDatagrid.show && item.db && item.db.type == 'datetime') {
+                if (item.moduleDatagrid && item.moduleDatagrid.show && item.db && item.db.type == 'datetime' && ['createTime', 'updateTime'].indexOf(item.fieldName)<0) {
                     dateTimeTypeArr.push(item);
                 }
             });%>
@@ -65,21 +65,40 @@ export default class extends BaseCrud {
     addAction() {
         // 获取参数
         let {
-            name, pwd, state, birthday
+            <% var addItemArr = [], getDateTimeStr='', getPwdStr='', recordObj={};
+            fieldData.forEach(function(item) {
+                if (item.moduleAdd && item.moduleAdd.show) {
+                    addItemArr.push(item);
+                    recordObj[item.fieldName] = item.fieldName;
+
+                    if (item.moduleAdd.options 
+                        && item.moduleAdd.options.param
+                        && item.moduleAdd.options.param.type 
+                        &&  item.moduleAdd.options.param.type === 'password') {
+                        getPwdStr = item.fieldName + " = think.md5('think_' + " + item.fieldName + ");";
+                    }
+                }
+
+                // TODO 这里最好不要写死，使用配置的方式会更好
+                if(item.fieldName == 'createTime'){
+                    getDateTimeStr='let datetime = this.getCurTimeStr();';
+                    recordObj['createTime'] = 'datetime';
+                }
+                if(item.fieldName == 'updateTime'){
+                    getDateTimeStr='let datetime = this.getCurTimeStr();';
+                    recordObj['updateTime'] = 'datetime';
+                }
+            });
+            %><%= addItemArr.map((item)=>{return item.fieldName}).join(',') %>
         } = this.post();
 
-        let datetime = this.getCurTimeStr();
+        <%= getDateTimeStr %>        
 
-        pwd = think.md5('think_' + pwd);
+        <%= getPwdStr %>
 
         let record = {
-            name: name,
-            pwd: pwd,
-            createTime: datetime,
-            updateTime: datetime,
-            state: state,
-            birthday: birthday
-        };
+            <%= Object.keys(recordObj).map((item)=>{return item+': '+recordObj[item]}).join(',') %>          
+        }
 
         let model = this.model('<%=sysNameEn%>');
 
