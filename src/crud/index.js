@@ -66,7 +66,13 @@ function saveTo(tplFullPath, saveFullPath, tplData) {
         content = _.template(content)(tplData);
     }
 
-    content = beautify(content);
+    if (path.extname(saveFullPath) == '.js') {
+        // 使用js-beautify美化js文件
+        content = beautify(content);
+
+        // 如果有多个连续的换行，则保持一个即可
+        content = content.replace(/\n[\s|.]*\r/g, '\n\r');
+    }
 
     // 保存
     save(saveFullPath, content);
@@ -82,10 +88,12 @@ var arr = [{
     from: path.join(TEMPLATE_BASE_PATH, 'src/logic.js'),
     to: path.join(RESULT_SRC_PATH, MODULE, 'logic', data.sysNameEn + '.js'),
     data: data
+}, {
+    from: path.join(TEMPLATE_BASE_PATH, 'src/controller.js'),
+    to: path.join(RESULT_SRC_PATH, MODULE, 'controller', data.sysNameEn + '.js'),
+    data: data
 }];
 
 arr.forEach(function(item) {
     saveTo(item.from, item.to, item.data);
 });
-
-

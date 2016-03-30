@@ -13,20 +13,42 @@ export default class extends BaseCrud {
     }
 
     /**
-     * 获得数据库表 think_user 中所有的用户信息
+     * 获得数据库表 <%=tableFullName%> 中所有的<%=sysNameCn%>信息
      * 
      * @return {object} JSON 格式数据
      */
     async getdataAction() {
-        // 查询数据库，获取所有的用户信息
-        let data = await this.model('user').order({
+        // 查询数据库，获取所有的<%=sysNameCn%>信息
+        let data = await this.model('<%=sysNameEn%>').order({
             id: "DESC",
         }).select();
 
         // 为了最后的显示，进行数据处理
         data = this.convertToDatagrid(data, item => {
-            // 生日
-            item.birthday = this.getCurDateStr(item.birthday);
+            <%  // 转义date类型的数据
+            var dateTypeArr = [];
+            fieldData.forEach(function(item) {
+                if (item.moduleDatagrid && item.moduleDatagrid.show && item.db && item.db.type == 'date') {
+                    dateTypeArr.push(item);
+                }
+            });           
+           %>
+            <% if (dateTypeArr.length) { %>
+                <%=dateTypeArr.map((item)=>{return ['// '+item.title, 'item.'+item.fieldName+' = this.getCurDateStr(item.'+item.fieldName+');'].join('\n')}).join('\n\n')%>
+            <% } %>
+            
+
+            <%// 转义dateTime类型的数据
+            var dateTimeTypeArr = [];
+            fieldData.forEach(function(item) {
+                if (item.moduleDatagrid && item.moduleDatagrid.show && item.db && item.db.type == 'datetime') {
+                    dateTimeTypeArr.push(item);
+                }
+            });%>
+            <% if (dateTimeTypeArr.length) { %>
+                <%=dateTimeTypeArr.map((item)=>{return ['// '+item.title, 'item.'+item.fieldName+' = this.getCurTimeStr(item.'+item.fieldName+');'].join('\n')}).join('\n\n')%>
+            <% } %>
+
 
             return item;
         });
@@ -36,7 +58,7 @@ export default class extends BaseCrud {
     }
 
     /**
-     * 新增数据到数据库表 think_user 中
+     * 新增数据到数据库表 <%=tableFullName%> 中
      * 
      * @return {object} JSON 格式数据
      */
@@ -59,7 +81,7 @@ export default class extends BaseCrud {
             birthday: birthday
         };
 
-        let model = this.model("user");
+        let model = this.model('<%=sysNameEn%>');
 
         // 参数校验，在logic中已完成
 
@@ -74,7 +96,7 @@ export default class extends BaseCrud {
     }
 
     /**
-     * 修改数据到数据库表 think_user 中
+     * 修改数据到数据库表 <%=tableFullName%> 中
      * 
      * @return {object} JSON 格式数据
      */
@@ -94,7 +116,7 @@ export default class extends BaseCrud {
             birthday: birthday
         };
 
-        let model = this.model("user");
+        let model = this.model('<%=sysNameEn%>');
 
         // 参数校验，在logic中已完成
 
@@ -106,14 +128,14 @@ export default class extends BaseCrud {
     }
 
     /**
-     * 从数据库表 think_user 中删除一条记录
+     * 从数据库表 <%=tableFullName%> 中删除一条记录
      *
      * @return {object} JSON 格式数据
      */
     deleteAction() {
         // 获取参数
         let id = this.post('id');
-        let model = this.model("user");
+        let model = this.model('<%=sysNameEn%>');
 
         // 参数校验，在logic中已完成
 
