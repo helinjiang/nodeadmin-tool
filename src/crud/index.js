@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
 var mkdirp = require('mkdirp');
+var beautify = require('js-beautify').js_beautify;
 
 var BASE_PATH = 'D:/code/nodeadmin-tool/src/crud',
     RESULT_BASE_PATH = path.join(BASE_PATH, 'result'),
@@ -65,6 +66,8 @@ function saveTo(tplFullPath, saveFullPath, tplData) {
         content = _.template(content)(tplData);
     }
 
+    content = beautify(content);
+
     // 保存
     save(saveFullPath, content);
 }
@@ -82,5 +85,7 @@ var arr = [{
 }];
 
 arr.forEach(function(item) {
-    saveTo(item.from, item.to);
+    saveTo(item.from, item.to, item.data);
 });
+
+

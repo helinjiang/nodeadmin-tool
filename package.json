@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "js-beautify": "^1.6.2",
     "lodash": "^4.6.1",
     "mkdirp": "^0.5.1"
   }

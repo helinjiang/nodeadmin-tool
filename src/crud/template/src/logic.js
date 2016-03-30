@@ -15,7 +15,6 @@ export default class extends think.logic.base {
     addAction() {
         // 只允许post操作
         this.allowMethods = "post";
-
         <%
         var rulesRequired = [];
         fieldData.forEach(function(item) {
@@ -23,37 +22,50 @@ export default class extends think.logic.base {
                 rulesRequired.push(item.fieldName);
             }
         });
-        console.log('---',rulesRequired);
         %>
-
-        <% if (rulesRequired.length){%>
-        // 其他规则
+        <% if (rulesRequired.length) { %>
+        // 校验规则
         this.rules = {
-            <%=rulesRequired.map((item)=>{return "name:'required'"}).join(',');
+            <%=rulesRequired.map((item)=>{return item+":'required'"}).join(',')%>
         };
-        <%}%>
+        <% } %>
     }
 
     modifyAction() {
         // 只允许post操作
         this.allowMethods = "post";
-
-        // 其他规则
+        <%
+        var rulesRequired = [];
+        fieldData.forEach(function(item) {
+            if (item.moduleModify && item.moduleModify.show && item.validator && item.validator.required && item.validator.required.rule) {
+                rulesRequired.push(item.fieldName);
+            }
+        });
+        %>
+        <% if (rulesRequired.length) { %>
+        // 校验规则
         this.rules = {
-            id: "required",
-            name: "required",
-            state: "required",
-            birthday: "required"
+            <%=rulesRequired.map((item)=>{return item+":'required'"}).join(',')%>
         };
+        <% } %>
     }
 
     deleteAction() {
         // 只允许post操作
         this.allowMethods = "post";
-
-        // 其他规则
+        <%
+        var rulesRequired = [];
+        fieldData.forEach(function(item) {
+            if (item.moduleDelete && item.moduleDelete.show && item.moduleDelete.options && item.moduleDelete.options.deleteDepend) {
+                rulesRequired.push(item.fieldName);
+            }
+        });
+        %>
+        <% if (rulesRequired.length) { %>
+        // 校验规则
         this.rules = {
-            id: "required"
+            <%=rulesRequired.map((item)=>{return item+":'required'"}).join(',')%>
         };
+        <% } %>
     }
 }
