@@ -8,6 +8,7 @@ var BASE_PATH = 'D:/code/nodeadmin-tool/src/crud',
     RESULT_BASE_PATH = path.join(BASE_PATH, 'result'),
     TEMPLATE_BASE_PATH = path.join(BASE_PATH, 'template'),
     RESULT_SRC_PATH = path.join(RESULT_BASE_PATH, 'src'),
+    RESULT_CLIENTSRC_PATH = path.join(RESULT_BASE_PATH, 'clientsrc'),
     RESULT_DATA_PATH = path.join(RESULT_BASE_PATH, 'data'),
     MODULE = 'admin';
 
@@ -63,6 +64,7 @@ function saveTo(tplFullPath, saveFullPath, tplData) {
     var content = fs.readFileSync(tplFullPath, 'utf8');
 
     if (tplData) {
+        tplData._ = _;
         content = _.template(content)(tplData);
     }
 
@@ -78,6 +80,8 @@ function saveTo(tplFullPath, saveFullPath, tplData) {
     save(saveFullPath, content);
 }
 
+var RESULT_PAGE_PATH = path.join(RESULT_CLIENTSRC_PATH, 'pages', data.sysNameEn + '_index');
+
 // saveSrcModel();
 // console.log(path.relative(process.argv[1],'./template/src/model.js'));
 var arr = [{
@@ -91,6 +95,10 @@ var arr = [{
 }, {
     from: path.join(TEMPLATE_BASE_PATH, 'src/controller.js'),
     to: path.join(RESULT_SRC_PATH, MODULE, 'controller', data.sysNameEn + '.js'),
+    data: data
+}, {
+    from: path.join(TEMPLATE_BASE_PATH, 'client/model.js'),
+    to: path.join(RESULT_PAGE_PATH, 'model.js'),
     data: data
 }];
 
