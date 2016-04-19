@@ -105,8 +105,24 @@ var arr = [{
     to: path.join(RESULT_PAGE_PATH, 'main.html'),
     data: data
 }, {
+    from: path.join(TEMPLATE_BASE_PATH, 'client/main.js'),
+    to: path.join(RESULT_PAGE_PATH, 'main.js'),
+    data: data
+}, {
     from: path.join(TEMPLATE_BASE_PATH, 'client/main.scss'),
     to: path.join(RESULT_PAGE_PATH, 'main.scss'),
+    data: data
+}, {
+    from: path.join(TEMPLATE_BASE_PATH, 'client/mainarea/main.html'),
+    to: path.join(RESULT_PAGE_PATH, 'mainarea/main.html'),
+    data: data
+}, {
+    from: path.join(TEMPLATE_BASE_PATH, 'client/mainarea/main.js'),
+    to: path.join(RESULT_PAGE_PATH, 'mainarea/main.js'),
+    data: data
+}, {
+    from: path.join(TEMPLATE_BASE_PATH, 'client/mainarea/main.scss'),
+    to: path.join(RESULT_PAGE_PATH, 'mainarea/main.scss'),
     data: data
 }];
 
