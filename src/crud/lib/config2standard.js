@@ -30,7 +30,7 @@ function optionShow(isShow) {
  *     }
  * }
  *     返回 {
- *         show : true,       
+ *         show : true,
  *         options: {
  *             type: 'input', // 表单类型
  *             param: { // 表单的额外参数
@@ -40,7 +40,7 @@ function optionShow(isShow) {
  *             deleteDepend:'id', // 只有在delete场景下才用得到
  *         }
  *     }
- * 
+ *
  * @param  {string|boolean|object}   value      p配置值
  * @param  {boolean}  isShowForm 是否处理成表格
  * @param  {object}   fieldData  该字段的定义
@@ -104,6 +104,12 @@ function moduleShow(value, isShowForm, fieldData) {
                         }]
                     }
                 });
+
+                // 特殊情况，删除options.param.type，这是因为判断dbConfig.type时默认了个options.param.type=“text"
+                if (options.param.type) {
+                    delete options.param.type;
+                }
+                
                 break;
             default:
                 break;
@@ -222,7 +228,7 @@ function getStandardData(initData) {
             }
         }
         /**
-         * validator 
+         * validator
          * 默认校验标准为数据库配置，但是可以有额外的覆盖，比如限制3-12长度，虽然可能数据库长度为64
          *
          * 如果定义了validator则合并之
