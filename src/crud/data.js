@@ -174,6 +174,6 @@ fieldData.push({
 
 data.fieldData = fieldData;
 
-data.fieldDefine = {};
+// data.fieldDefine = {};
 
 module.exports = data;

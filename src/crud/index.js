@@ -100,6 +100,14 @@ var arr = [{
     from: path.join(TEMPLATE_BASE_PATH, 'client/model.js'),
     to: path.join(RESULT_PAGE_PATH, 'model.js'),
     data: data
+}, {
+    from: path.join(TEMPLATE_BASE_PATH, 'client/main.html'),
+    to: path.join(RESULT_PAGE_PATH, 'main.html'),
+    data: data
+}, {
+    from: path.join(TEMPLATE_BASE_PATH, 'client/main.scss'),
+    to: path.join(RESULT_PAGE_PATH, 'main.scss'),
+    data: data
 }];
 
 arr.forEach(function(item) {
