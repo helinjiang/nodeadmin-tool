@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var configDb = require('./lib/configdb');
+var configDb = require('../lib/configdb');
 
 var data = {
     sysNameEn: 'user',
