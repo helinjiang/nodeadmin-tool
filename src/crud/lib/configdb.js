@@ -87,7 +87,7 @@ function getDefaultPrimaryKey() {
  */
 function getDefaultString(required) {
     return _.assign(new ConfigDb(), {
-        defaultVar: '',
+        // defaultVar: '',
         isNotNull: !!required
     });
 }

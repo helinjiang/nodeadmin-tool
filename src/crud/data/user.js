@@ -5,7 +5,7 @@ var data = {
     sysNameEn: 'user',
     sysNameCn: '用户',
     tableName: 'user',
-    tableFullName: 'think_user'
+    tableFullName: 'hlj_user'
 }
 
 var fieldData = [];
@@ -118,28 +118,28 @@ fieldData.push({
 });
 
 // 生日
-fieldData.push({
-    fieldName: 'birthday',
-    title: '生日',
+// fieldData.push({
+//     fieldName: 'birthday',
+//     title: '生日',
 
-    db: configDb.getDefaultDate(),
+//     db: configDb.getDefaultDate(),
 
-    moduleDatagrid: true,
-    moduleAdd: {
-        options: {
-            value: '2016-03-01'
-        }
-    },
-    moduleModify: true,
-    moduleDetail: true,
-    moduleDelete: true,
-    validator: {
-        required: {
-            rule: true,
-            message: '生日不能为空！'
-        }
-    }
-});
+//     moduleDatagrid: true,
+//     moduleAdd: {
+//         options: {
+//             value: '2016-03-01'
+//         }
+//     },
+//     moduleModify: true,
+//     moduleDetail: true,
+//     moduleDelete: true,
+//     validator: {
+//         required: {
+//             rule: true,
+//             message: '生日不能为空！'
+//         }
+//     }
+// });
 
 // 创建时间
 fieldData.push({

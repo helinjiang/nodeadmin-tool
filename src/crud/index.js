@@ -176,6 +176,10 @@ function deal(basePath) {
             from: path.join(TEMPLATE_BASE_PATH, 'client/mainarea/main.scss'),
             to: path.join(RESULT_PAGE_PATH, 'mainarea/main.scss'),
             data: data
+        }, {
+            from: path.join(TEMPLATE_BASE_PATH, 'db/dbtable.sql'),
+            to: path.join(RESULT_DATA_PATH, path.basename(item.relativePath, path.extname(item.relativePath)), 'dbtable.sql'),
+            data: data
         }];
 
         // 依次处理
