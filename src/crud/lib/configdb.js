@@ -82,6 +82,17 @@ function getDefaultPrimaryKey() {
 }
 
 /**
+ * 获得外键类型的默认配置
+ */
+function getDefaultForeignKey() {
+    return _.assign(new ConfigDb(), {
+        type: 'int',
+        length: 11,
+        property: 'UNSIGNED'
+    });
+}
+
+/**
  * 获得普通字符串的默认配置
  * @param {boolean} required 是否为必须填写的字段
  */
@@ -151,5 +162,6 @@ module.exports = {
     getDefaultTime: getDefaultTime,
     getDefaultDate: getDefaultDate,
     getDefaultMark: getDefaultMark,
-    getDefaultText: getDefaultText
+    getDefaultText: getDefaultText,
+    getDefaultForeignKey: getDefaultForeignKey
 }
