@@ -84,6 +84,12 @@ function moduleShow(value, isShowForm, fieldData) {
                     type: 'date'
                 };
                 break;
+            case 'text':
+                // case 'datetime':
+                options = {
+                    type: 'bootstrap-markdown'
+                };
+                break;
             default:
                 break;
         }

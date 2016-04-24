@@ -4,12 +4,13 @@
 DROP TABLE IF EXISTS `<%= tableFullName %>`;
 CREATE TABLE `<%= tableFullName %>` (
     <%
-        var resultArr = [], primaryKey;
+        var fieldDefineArr = [], primaryKey,uniqueArr=[],resultArr=[];
         fieldData.forEach(function(item){
             if(!item.db){
                 return;
             }
 
+            // TODO 可能有多主键的场景
             if (item.db.isPrimaryKey){
                 primaryKey = item.db.fieldName;
             }
@@ -47,13 +48,23 @@ CREATE TABLE `<%= tableFullName %>` (
             if(item.db.comment){
                 arr.push("COMMENT '" + item.db.comment + "'");
             }
-            resultArr.push(arr.join(' '));
-        })
-    %>
-  <%= resultArr.join(',\n') %>,
-  PRIMARY KEY (`<%= primaryKey %>`) 
+            fieldDefineArr.push(arr.join(' '));
 
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+            if (item.db.isUnique){
+                uniqueArr.push('UNIQUE KEY `'+item.db.fieldName+'` (`'+item.db.fieldName+'`)');
+            }
+        })
+
+        resultArr.push(fieldDefineArr.join(',\n'));
+        resultArr.push('PRIMARY KEY (`'+ primaryKey + '`) ');
+        if (uniqueArr.length){
+            resultArr.push(uniqueArr.join(',\n'));
+        }
+        
+    %>
+  <%= resultArr.join(',\n') %>
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of <%= tableFullName %>

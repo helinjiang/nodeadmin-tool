@@ -115,7 +115,7 @@ function getDefaultTime() {
 }
 
 /**
- * 获得"r日期"的默认配置，比如生日等等
+ * 获得"日期"的默认配置，比如生日等等
  */
 function getDefaultDate() {
     return _.assign(new ConfigDb(), {
@@ -130,7 +130,17 @@ function getDefaultDate() {
 function getDefaultMark() {
     return _.assign(new ConfigDb(), {
         length: 127,
+        isNotNull: false,
         defaultVar: ''
+    });
+}
+
+/**
+ * 获得"text"类型的默认配置
+ */
+function getDefaultText() {
+    return _.assign(new ConfigDb(), {
+        type: 'text',
     });
 }
 
@@ -140,5 +150,6 @@ module.exports = {
     getDefaultState: getDefaultState,
     getDefaultTime: getDefaultTime,
     getDefaultDate: getDefaultDate,
-    getDefaultMark: getDefaultMark
+    getDefaultMark: getDefaultMark,
+    getDefaultText: getDefaultText
 }

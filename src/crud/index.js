@@ -114,11 +114,11 @@ function saveTo(tplFullPath, saveFullPath, tplData) {
  * 处理函数
  * @param  {string}   basePath 根目录
  */
-function deal(basePath) {
-    var BASE_PATH = basePath,
-        DATA_BASE_PATH = path.join(BASE_PATH, 'data'),
+function deal(from, to) {
+    var BASE_PATH = 'D:/code/nodeadmin-tool/src/crud', // TODO 此处不需要指定路径
+        DATA_BASE_PATH = from,
+        RESULT_BASE_PATH = to,
         TEMPLATE_BASE_PATH = path.join(BASE_PATH, 'template'),
-        RESULT_BASE_PATH = path.join(BASE_PATH, 'result'),
         RESULT_SRC_PATH = path.join(RESULT_BASE_PATH, 'src'),
         RESULT_CLIENTSRC_PATH = path.join(RESULT_BASE_PATH, 'clientsrc'),
         RESULT_DATA_PATH = path.join(RESULT_BASE_PATH, 'data'),
@@ -190,4 +190,4 @@ function deal(basePath) {
 }
 
 // 执行
-deal('D:/code/nodeadmin-tool/src/crud');
+deal('D:/code/nodeadmin-tool/src/crud/data', 'D:/code/super-helinjiang/data/autogen');
