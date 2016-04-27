@@ -108,7 +108,7 @@ export default class extends BaseCrud {
         
         <% if (foreinKeyArr.length){%>
             // 注意，当页面端未选择时，外键的值可能会被更改为0或者undefined，必须要修改成null，否则会被数据库外键策略限制
-            <%=  foreinKeyArr.map((item)=>{return 'record.'+item+'=null;'}).join('\n')%>
+            <%=  foreinKeyArr.map((item)=>{return 'if(!record.'+item+'){record.'+item+'=null;}'}).join('\n')%>
         <%}%>
 
         let model = this.model('<%=sysNameEn%>');
@@ -179,7 +179,7 @@ export default class extends BaseCrud {
 
         <% if (foreinKeyArr.length){%>
             // 注意，当页面端未选择时，外键的值可能会被更改为0或者undefined，必须要修改成null，否则会被数据库外键策略限制
-            <%=  foreinKeyArr.map((item)=>{return 'record.'+item+'=null;'}).join('\n')%>
+            <%=  foreinKeyArr.map((item)=>{return 'if(!record.'+item+'){record.'+item+'=null;}'}).join('\n')%>
         <%}%>
         let model = this.model('<%=sysNameEn%>');
 
