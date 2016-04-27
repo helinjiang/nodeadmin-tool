@@ -63,7 +63,7 @@ export default class extends BaseCrud {
      * @return {object} JSON 格式数据
      */
     addAction() {
-        <% var addItemArr = [], getDateTimeStr='', getPwdStr='', recordObj={};
+        <% var addItemArr = [], foreinKeyArr = [], getDateTimeStr='', getPwdStr='', recordObj={};
             fieldData.forEach(function(item) {
                 if (item.moduleAdd && item.moduleAdd.show) {
                     addItemArr.push(item);
@@ -86,6 +86,11 @@ export default class extends BaseCrud {
                     getDateTimeStr='let datetime = this.getCurTimeStr();';
                     recordObj['updateTime'] = 'datetime';
                 }
+
+                // 外键
+                if(item.db && item.db.foreignKeyConfig){
+                    foreinKeyArr.push(item.fieldName);
+                }
             });
         %>
         // 获取参数
@@ -100,6 +105,11 @@ export default class extends BaseCrud {
         let record = {
             <%= Object.keys(recordObj).map((item)=>{return item+': '+recordObj[item]}).join(',') %>          
         }
+        
+        <% if (foreinKeyArr.length){%>
+            // 注意，当页面端未选择时，外键的值可能会被更改为0或者undefined，必须要修改成null，否则会被数据库外键策略限制
+            <%=  foreinKeyArr.map((item)=>{return 'record.'+item+'=null;'}).join('\n')%>
+        <%}%>
 
         let model = this.model('<%=sysNameEn%>');
 
@@ -129,7 +139,7 @@ export default class extends BaseCrud {
      * @return {object} JSON 格式数据
      */
     modifyAction() {
-        <% var modifyItemArr = [], getDateTimeStr='', getPwdStr='', recordObj={};
+        <% var modifyItemArr = [], foreinKeyArr = [], getDateTimeStr='', getPwdStr='', recordObj={};
             fieldData.forEach(function(item) {
                 if (item.moduleModify && item.moduleModify.show) {
                     modifyItemArr.push(item);
@@ -147,6 +157,11 @@ export default class extends BaseCrud {
                     getDateTimeStr='let datetime = this.getCurTimeStr();';
                     recordObj['updateTime'] = 'datetime';
                 }
+
+                // 外键
+                if(item.db && item.db.foreignKeyConfig){
+                    foreinKeyArr.push(item.fieldName);
+                }
             });
         %>
         // 获取参数
@@ -162,6 +177,10 @@ export default class extends BaseCrud {
             <%= Object.keys(recordObj).map((item)=>{return item+': '+recordObj[item]}).join(',') %>    
         };
 
+        <% if (foreinKeyArr.length){%>
+            // 注意，当页面端未选择时，外键的值可能会被更改为0或者undefined，必须要修改成null，否则会被数据库外键策略限制
+            <%=  foreinKeyArr.map((item)=>{return 'record.'+item+'=null;'}).join('\n')%>
+        <%}%>
         let model = this.model('<%=sysNameEn%>');
 
         // 参数校验，在logic中已完成
