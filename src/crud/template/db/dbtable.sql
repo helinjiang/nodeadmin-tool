@@ -4,7 +4,11 @@
 DROP TABLE IF EXISTS `<%= tableFullName %>`;
 CREATE TABLE `<%= tableFullName %>` (
     <%
-        var fieldDefineArr = [], primaryKey,uniqueArr=[],resultArr=[];
+        var fieldDefineArr = [], 
+            primaryKey,
+            uniqueArr=[],
+            foreignKeyArr=[],
+            resultArr=[];
         fieldData.forEach(function(item){
             if(!item.db){
                 return;
@@ -21,8 +25,8 @@ CREATE TABLE `<%= tableFullName %>` (
             if (['int', 'varchar', 'char'].indexOf(item.db.type) > -1){
                 arr.push(item.db.type + '(' +item.db.length + ')');
 
-                if (item.db.isPrimaryKey){
-                    arr.push('unsigned');
+                if (item.db.property){
+                    arr.push(item.db.property);
                 }
             } else {
                 arr.push(item.db.type);
@@ -36,7 +40,7 @@ CREATE TABLE `<%= tableFullName %>` (
                 arr.push('AUTO_INCREMENT');
             }
 
-            // TODO isUnique
+            // 默认值
             if (typeof item.db.defaultVar !== 'undefined'){
                 if (typeof item.db.defaultVar === 'string'){
                     arr.push("DEFAULT '" + item.db.defaultVar + "'");
@@ -50,8 +54,14 @@ CREATE TABLE `<%= tableFullName %>` (
             }
             fieldDefineArr.push(arr.join(' '));
 
+            // 唯一值
             if (item.db.isUnique){
                 uniqueArr.push('UNIQUE KEY `'+item.db.fieldName+'` (`'+item.db.fieldName+'`)');
+            }
+
+            // 外键
+            if(item.db.foreignKeyConfig){
+                foreignKeyArr.push('KEY `'+tableName+'_'+item.db.fieldName+'` (`'+item.db.fieldName+'`),\nCONSTRAINT `'+tableName+'_'+item.db.fieldName+'` FOREIGN KEY (`'+item.db.fieldName+'`) REFERENCES `'+item.db.foreignKeyConfig.tableName+'` (`'+item.db.foreignKeyConfig.tableFieldName+'`)');
             }
         })
 
@@ -59,6 +69,10 @@ CREATE TABLE `<%= tableFullName %>` (
         resultArr.push('PRIMARY KEY (`'+ primaryKey + '`) ');
         if (uniqueArr.length){
             resultArr.push(uniqueArr.join(',\n'));
+        }
+
+        if (foreignKeyArr.length){
+            resultArr.push(foreignKeyArr.join(',\n'));
         }
         
     %>
