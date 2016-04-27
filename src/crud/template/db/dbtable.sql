@@ -9,6 +9,7 @@ CREATE TABLE `<%= tableFullName %>` (
             uniqueArr=[],
             foreignKeyArr=[],
             resultArr=[];
+
         fieldData.forEach(function(item){
             if(!item.db){
                 return;
@@ -61,7 +62,12 @@ CREATE TABLE `<%= tableFullName %>` (
 
             // 外键
             if(item.db.foreignKeyConfig){
-                foreignKeyArr.push('KEY `'+tableName+'_'+item.db.fieldName+'` (`'+item.db.fieldName+'`),\nCONSTRAINT `'+tableName+'_'+item.db.fieldName+'` FOREIGN KEY (`'+item.db.fieldName+'`) REFERENCES `'+item.db.foreignKeyConfig.tableName+'` (`'+item.db.foreignKeyConfig.tableFieldName+'`)');
+                var fkLength = foreignKeyArr.length,
+                    fkKey = 'KEY `'+tableName+'_'+item.db.fieldName+'` (`'+item.db.fieldName+'`)',
+                    fkDefine = 'CONSTRAINT `'+tableName+'_'+item.db.fieldName+'` FOREIGN KEY (`'+item.db.fieldName+'`) REFERENCES `'+item.db.foreignKeyConfig.tableName+'` (`'+item.db.foreignKeyConfig.tableFieldName+'`)';
+                  
+                    foreignKeyArr.splice(fkLength/2,0,fkKey);                    
+                    foreignKeyArr.push(fkDefine);                
             }
         })
 
